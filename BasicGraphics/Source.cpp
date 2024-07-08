@@ -7,9 +7,15 @@ void processInput(GLFWwindow* window);
 
 // Normalized Device Coordinates for triangle (different from screen coordinates)
 float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    0.5f,  0.5f, 0.0f,   // top right
+    0.5f, -0.5f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
+};
+
+unsigned int indices[] = {
+    0, 1, 3,
+    1, 2, 3
 };
 
 const char* vertexShaderSource = "#version 330 core\n"
@@ -95,6 +101,15 @@ int main()
 
 
 
+    // Initialize Element Buffer Object
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    // Bind EBO and copy indices into the buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
+
     // Initialize and compile fragment shader
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -135,7 +150,7 @@ int main()
 
     // Specify how vertex data should be interpreted
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    // Enable vertex attribute
+    // Enable vertex attribute (0 for location, as specified in vertex shader)
     glEnableVertexAttribArray(0);
 
 
@@ -152,8 +167,12 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         // draw triangle
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // WITHOUT EBO
+        //glBindVertexArray(VAO);
+        //glDrawArrays(GL_TRIANGLES, 0, 3); 
+        // WITH EBO
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // swap buffers and poll IO devices
         glfwSwapBuffers(window);
