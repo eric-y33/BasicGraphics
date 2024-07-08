@@ -155,6 +155,11 @@ int main()
 
 
 
+    // Wireframe mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
