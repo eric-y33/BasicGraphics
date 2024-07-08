@@ -19,15 +19,15 @@ const char* vertexShaderSource = "#version 330 core\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
+const char* fragmentShaderSource = "version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
+
 int main()
 {
-    // Initialize GLAD to manage function pointers
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
-
     // Initialize GLFW window settings
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -44,6 +44,22 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    // Initialize GLAD to manage function pointers
+    // This code must be after the window is created
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    // Size of rendering window (location of lower left corner, dimensions)
+    glViewport(0, 0, 800, 600);
+
+    // Resize viewport if window is resized
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+
 
     // Initialize vertex buffer objects and bind to target
     unsigned int VBO;
@@ -69,11 +85,23 @@ int main()
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    // Size of rendering window (location of lower left corner, dimensions)
-    glViewport(0, 0, 800, 600);
 
-    // Resize viewport if window is resized
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // Initialize and compile fragment shader
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    // Check if fragment shader compiled correctly
+    int  success2;
+    char infoLog2[512];
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success2);
+    if (!success2)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog2);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog2 << std::endl;
+    }
 
 
 
