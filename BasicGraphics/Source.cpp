@@ -19,7 +19,7 @@ const char* vertexShaderSource = "#version 330 core\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
 
-const char* fragmentShaderSource = "version 330 core\n"
+const char* fragmentShaderSource = "#version 330 core\n"
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
@@ -61,6 +61,14 @@ int main()
 
 
 
+    // Initialize Vertex Array Object
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    // Bind Vertex Array Object
+    glBindVertexArray(VAO);
+
+
+
     // Initialize vertex buffer objects and bind to target
     unsigned int VBO;
     glGenBuffers(1, &VBO);
@@ -94,14 +102,41 @@ int main()
     glCompileShader(fragmentShader);
 
     // Check if fragment shader compiled correctly
-    int  success2;
-    char infoLog2[512];
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success2);
-    if (!success2)
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog2);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog2 << std::endl;
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
+
+
+
+    // Create shaader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+
+    // Attach previously compiled shaders to program object and link them
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // Check if shader program linking worked
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Don't need shader objects after linking
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+
+
+    // Specify how vertex data should be interpreted
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // Enable vertex attribute
+    glEnableVertexAttribArray(0);
 
 
 
@@ -112,8 +147,13 @@ int main()
         processInput(window);
 
         // rendering commands
+        // draw background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        // draw triangle
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // swap buffers and poll IO devices
         glfwSwapBuffers(window);
