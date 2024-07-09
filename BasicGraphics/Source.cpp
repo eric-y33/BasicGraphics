@@ -184,6 +184,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         // use our custom shader class
         ourShader.use();
+        ourShader.setFloat("xOffset", 0.0f);
         // draw triangle
         // set up uniform for fragment shader
         /*float timeValue = glfwGetTime();
