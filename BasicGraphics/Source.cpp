@@ -55,8 +55,8 @@ int main()
     };
 
     unsigned int indices[] = {
-        0, 3, 9,
-        3, 6, 9
+        0, 1, 3,
+        1, 2, 3
     };
 
     unsigned int VAO, VBO, EBO;
