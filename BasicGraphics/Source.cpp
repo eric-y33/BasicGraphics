@@ -7,20 +7,6 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-// Normalized Device Coordinates (different from screen coordinates)
-float vertices[] = {
-    // positions         // colors            // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-};
-
-unsigned int indices[] = {
-    0, 3, 9,
-    3, 6, 9
-};
-
 int main()
 {
     // Initialize GLFW window settings
@@ -54,50 +40,52 @@ int main()
     // Resize viewport if window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-
-
-    // Initialize Vertex Array Object
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    // Bind Vertex Array Object
-    glBindVertexArray(VAO);
-
-
-
-    // Initialize vertex buffer objects and bind to target
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Copy previously defined vertex data into buffer memory
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-
-
+    // Set shader
     Shader ourShader("shader.vs", "shader.fs");
 
 
+
+    // Normalized Device Coordinates
+    float vertices[] = {
+        // positions         // colors            // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    };
+
+    unsigned int indices[] = {
+        0, 3, 9,
+        3, 6, 9
+    };
+
+    unsigned int VAO, VBO, EBO;
+
+    // Initialize Vertex Array Object
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Initialize Vertex Buffer Objects
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // Copy vertex data into buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     // Initialize Element Buffer Object
-    unsigned int EBO;
     glGenBuffers(1, &EBO);
-    // Bind EBO and copy indices into the buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // Copy indices into the buffer
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
 
     // Specify how vertex data should be interpreted
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    // Enable vertex attribute (0 for location, as specified in vertex shader)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
     glEnableVertexAttribArray(2);
-
-
-
-    // Wireframe mode
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 
@@ -128,28 +116,28 @@ int main()
 
 
 
+
+    // Wireframe mode
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
         // input
         processInput(window);
-
-        // rendering commands
+        
         // draw background
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
         // use our custom shader class
         ourShader.use();
-        ourShader.setFloat("xOffset", 0.0f);
-        // draw triangle
-        
+
         // bind textures
-        //glBindTexture(GL_TEXTURE_2D, texture);
-        // WITHOUT EBO
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3); 
-        // WITH EBO
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        // draw triangles
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // swap buffers and poll IO devices
