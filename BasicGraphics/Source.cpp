@@ -21,25 +21,6 @@ unsigned int indices[] = {
     3, 6, 9
 };
 
-//
-//const char* vertexShaderSource = "#version 330 core\n"
-//    "layout (location = 0) in vec3 aPos;\n"
-//    "layout (location = 1) in vec3 aColor;\n"
-//    "out vec3 ourColor;\n"
-//    "void main()\n"
-//    "{\n"
-//    "   gl_Position = vec4(aPos, 1.0);\n"
-//    "   ourColor = aColor;\n"
-//    "}\0";
-
-//const char* fragmentShaderSource = "#version 330 core\n"
-//    "out vec4 FragColor;\n"
-//    "in vec3 ourColor;\n"
-//    "void main()\n"
-//    "{\n"
-//    "   FragColor = vec4(ourColor, 1.0);\n"
-//    "}\0";
-
 int main()
 {
     // Initialize GLFW window settings
@@ -95,70 +76,12 @@ int main()
     Shader ourShader("shader.vs", "shader.fs");
 
 
-
-    //// Initialize vertex shader object
-    //unsigned int vertexShader;
-    //vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    //// Attach shader source code to shader object and compile
-    //glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    //glCompileShader(vertexShader);
-
-    //// Check if vertex shader compiled correctly
-    //int  success;
-    //char infoLog[512];
-    //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    //if (!success)
-    //{
-    //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //}
-
-
-
     // Initialize Element Buffer Object
     unsigned int EBO;
     glGenBuffers(1, &EBO);
     // Bind EBO and copy indices into the buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-
-
-    //// Initialize and compile fragment shader
-    //unsigned int fragmentShader;
-    //fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    //glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    //glCompileShader(fragmentShader);
-
-    //// Check if fragment shader compiled correctly
-    //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    //if (!success)
-    //{
-    //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //}
-
-
-
-    //// Create shaader program
-    //unsigned int shaderProgram;
-    //shaderProgram = glCreateProgram();
-
-    //// Attach previously compiled shaders to program object and link them
-    //glAttachShader(shaderProgram, vertexShader);
-    //glAttachShader(shaderProgram, fragmentShader);
-    //glLinkProgram(shaderProgram);
-
-    //// Check if shader program linking worked
-    //glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    //if (!success) {
-    //    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    //    std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-    //}
-
-    //// Don't need shader objects after linking
-    //glDeleteShader(vertexShader);
-    //glDeleteShader(fragmentShader);
 
 
 
@@ -219,13 +142,7 @@ int main()
         ourShader.use();
         ourShader.setFloat("xOffset", 0.0f);
         // draw triangle
-        // set up uniform for fragment shader
-        /*float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");*/
-        /*glUseProgram(shaderProgram);*/
-        // apply uniform to currently active shader
-        /*glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
+        
         // bind textures
         //glBindTexture(GL_TEXTURE_2D, texture);
         // WITHOUT EBO
