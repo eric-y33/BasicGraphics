@@ -49,13 +49,6 @@ int main()
 
 
     // Normalized Device Coordinates
-    //float vertices[] = {
-    //    // positions         // colors            // texture coords
-    //     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-    //     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    //    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    //    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    //};
     float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -100,26 +93,6 @@ int main()
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-   /* unsigned int indices[] = {
-        0, 1, 3,
-        1, 2, 3,
-        
-        6, 7, 9,
-        7, 8, 9,
-
-        12, 13, 15,
-        13, 14, 15,
-
-        18, 19, 21,
-        19, 20, 21,
-
-        24, 25, 27,
-        25, 26, 27,
-
-        30, 31, 33,
-        31, 32, 33
-    };*/
-
     glm::vec3 cubePositions[] = {
     glm::vec3(0.0f,  0.0f,  0.0f),
     glm::vec3(2.0f,  5.0f, -15.0f),
@@ -133,7 +106,9 @@ int main()
     glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
-    unsigned int VAO, VBO, EBO;
+
+
+    unsigned int VAO, VBO;
 
     // Initialize Vertex Array Object
     glGenVertexArrays(1, &VAO);
@@ -144,12 +119,6 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // Copy vertex data into buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    //// Initialize Element Buffer Object
-    //glGenBuffers(1, &EBO);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    //// Copy indices into the buffer
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
 
@@ -222,14 +191,14 @@ int main()
 
 
 
-    //// Setup transformation matrix
-    //glm::mat4 trans = glm::mat4(1.0f);
-    //trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    //trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-    //// Pass transformation matrix to vertex shader
-    //unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-    //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
+    // Setup camera
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm:: vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // yes this "direction" is pointing in reverse
+    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
 
 
 
@@ -256,21 +225,16 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
         glBindVertexArray(VAO);
 
-        // Update rotation
-        /*glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
-
         // Model matrix
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         // View matrix
-        glm::mat4 view = glm::mat4(1.0f);
-        // Translate scene in reverse direction of way we want to move camera
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 
         // Projection matrix
         glm::mat4 projection;
