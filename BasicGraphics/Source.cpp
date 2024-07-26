@@ -253,7 +253,7 @@ int main()
 
         // Projection matrix
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.5f, 100.0f);
+        projection = glm::perspective(glm::radians(ourCamera.Zoom), 800.0f / 600.0f, 0.5f, 100.0f);
 
 
 
@@ -334,6 +334,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    ourCamera.ProcessMouseScroll(yoffset);
+    ourCamera.ProcessMouseScroll((float)yoffset);
 }
 
