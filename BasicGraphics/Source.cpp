@@ -10,6 +10,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 // Camera vectors for interactable camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -23,6 +24,8 @@ float pitch = 0.0f;
 float lastX = 400, lastY = 300;
 
 bool firstMouse = true;
+
+float fov = 45.0f;
 
 int main()
 {
@@ -58,8 +61,9 @@ int main()
     // Resize viewport if window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // Set mouse callback
+    // Set mouse and scroll callback
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // Set shader
     Shader ourShader("shader.vs", "shader.fs");
@@ -261,7 +265,7 @@ int main()
 
         // Projection matrix
         glm::mat4 projection;
-        projection = glm::perspective(glm::radians(50.0f), 800.0f / 600.0f, 0.5f, 100.0f);
+        projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.5f, 100.0f);
 
 
 
@@ -354,5 +358,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(direction);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float) yoffset;
+    if (fov < 1.0f) 
+        fov = 1.0f;
+    if (fov > 45.0f) 
+        fov = 45.0f;
 }
 
