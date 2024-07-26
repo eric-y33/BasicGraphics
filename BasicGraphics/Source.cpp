@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -26,6 +27,9 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 
 float fov = 45.0f;
+
+// Set camera
+Camera ourCamera(cameraPos, cameraUp, yaw, pitch);
 
 int main()
 {
@@ -61,14 +65,12 @@ int main()
     // Resize viewport if window is resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // Set mouse and scroll callback
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-
     // Set shader
     Shader ourShader("shader.vs", "shader.fs");
 
-
+    // Set mouse and scroll callback
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     // Normalized Device Coordinates
     float vertices[] = {
@@ -213,17 +215,6 @@ int main()
 
 
 
-    //// Setup camera
-    //glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    //glm:: vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    //// yes this "direction" is pointing in reverse
-    //glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-    //glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    //glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    //glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-
-
     // Wireframe mode
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -257,11 +248,8 @@ int main()
         model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         // View matrix
-        /*const float radius = 12.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;*/
         glm::mat4 view;
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = ourCamera.GetViewMatrix();
 
         // Projection matrix
         glm::mat4 projection;
@@ -311,15 +299,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    const float cameraSpeed = 2.5f * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        ourCamera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        ourCamera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        ourCamera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        ourCamera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -329,6 +316,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    
     if (firstMouse)
     {
         lastX = xpos;
@@ -341,31 +329,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(direction);
+    ourCamera.ProcessMouseMovement(xoffset, yoffset, true);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float) yoffset;
-    if (fov < 1.0f) 
-        fov = 1.0f;
-    if (fov > 45.0f) 
-        fov = 45.0f;
+    ourCamera.ProcessMouseScroll(yoffset);
 }
 
