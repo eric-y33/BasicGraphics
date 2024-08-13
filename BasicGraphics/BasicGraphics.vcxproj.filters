@@ -47,5 +47,8 @@
     <Image Include="awesomeface.png">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="squarerowlet.png">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

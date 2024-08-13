@@ -157,7 +157,7 @@ int main()
     unsigned char* data1 = stbi_load("container.jpg", &width1, &height1, &nrChannels1, 0);
     int width2, height2, nrChannels2;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data2 = stbi_load("awesomeface.png", &width2, &height2, &nrChannels2, 0);
+    unsigned char* data2 = stbi_load("squarerowlet.png", &width2, &height2, &nrChannels2, 0);
     
     // Initialize first texture
     unsigned int texture1;
@@ -268,7 +268,7 @@ int main()
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            if (i % 2 == 0)
+            if (i != 0)
             {
                 model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
             }
